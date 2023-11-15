@@ -62,8 +62,6 @@ public class ProductisinofstockFragment extends Fragment {
 
 //    hàm lấy danh sách sản phẩm còn hàng
     private void pullProduct_IsInofStock(){
-
-        System.out.println("id shop: " + shopData.getIdShop());
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("Product");
         Query query =  databaseReference.orderByChild("idUserProduct").equalTo(shopData.getIdShop());

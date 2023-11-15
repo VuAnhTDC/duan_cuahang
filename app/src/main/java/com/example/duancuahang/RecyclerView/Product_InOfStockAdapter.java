@@ -17,6 +17,7 @@ import com.example.duancuahang.Class.Manuface;
 import com.example.duancuahang.Class.ProductData;
 import com.example.duancuahang.Detailproduct;
 import com.example.duancuahang.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -149,17 +150,13 @@ public class Product_InOfStockAdapter extends RecyclerView.Adapter<Product_InOfS
         holder.tvNameProductItem.setText(productData.getNameProduct());
         holder.tvPriceProduct.setText("Giá: "+productData.getPriceProduct() + "VND");
         holder.tvQuanlityProduct.setText("Số lượng: "+productData.getQuanlityProduct());
-        databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(productData.getIdProduct());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("ImageProducts/"+productData.getIdProduct()+"/1");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    for (DataSnapshot imageItem : snapshot.getChildren()){
-                       Image image = imageItem.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).placeholder(R.drawable.icondowload).into(holder.imgProductItem);
-                        return;
-                    }
+                   String urlFirst = snapshot.child("urlImage").getValue().toString();
+                    Picasso.get().load(urlFirst).placeholder(R.drawable.icondowload).into(holder.imgProductItem);
                 }
             }
 
@@ -173,7 +170,13 @@ public class Product_InOfStockAdapter extends RecyclerView.Adapter<Product_InOfS
 //    hàm xóa sản phẩm dựa vào id product
     private void deleteProduct(String idProduct,Product_InOfStockViewHolder holder){
         databaseReference = firebaseDatabase.getReference("Product");
-        databaseReference.child(idProduct).removeValue();
+        databaseReference.child(idProduct).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                databaseReference = firebaseDatabase.getReference("ImageProducts/" +idProduct);
+                databaseReference.removeValue();
+            }
+        });
     }
 
 
